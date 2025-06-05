@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Сетка - {{ cat.label }}</title>
+</head>
+<body>
+<h1>Сетка - {{ cat.label }}</h1>
+<a href="/{{ category }}/teams">К командам</a>
+{% for round_index, round in enumerate(data.bracket) %}
+<h2>Раунд {{ loop.index }}</h2>
+<table border="1">
+<tr><th>Команда 1</th><th>Счет</th><th>Команда 2</th><th>Действия</th></tr>
+{% for match_index, match in enumerate(round) %}
+<tr>
+    <td>{{ match.team1.name if match.team1 else '-' }}</td>
+    <td>
+        {% if match.winner is none and match.team1 and match.team2 %}
+        <form method="post">
+            <input type="hidden" name="round" value="{{ round_index }}">
+            <input type="hidden" name="match" value="{{ match_index }}">
+            <input type="number" name="score1" required style="width:50px">
+            :
+            <input type="number" name="score2" required style="width:50px">
+        {% if match.winner is none %}
+            <button type="submit">Сохранить</button>
+        {% endif %}
+        </form>
+        {% elif match.score1 is not none %}
+            {{ match.score1 }} : {{ match.score2 }}
+        {% else %}-{% endif %}
+    </td>
+    <td>{{ match.team2.name if match.team2 else '-' }}</td>
+    <td>{{ match.winner.name if match.winner else '-' }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endfor %}
+</body>
+</html>

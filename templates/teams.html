@@ -1,18 +1,18 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <title>{{ cat.label }} - Команды</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}{{ cat.label }}{% endblock %}
+{% block content %}
 <h1>{{ cat.label }}</h1>
-<a href="/{{ category }}/add_team">Добавить команду</a> |
-<a href="/{{ category }}/start">Начать турнир</a> |
-<a href="/">Все категории</a>
+<p>
+    <a class="btn btn-primary" href="/{{ category }}/add_team">Добавить команду</a>
+    <a class="btn btn-success" href="/{{ category }}/start">Начать турнир</a>
+    <a class="btn btn-secondary" href="/{{ category }}/export">Скачать файл</a>
+</p>
 <ul>
 {% for team in data.teams %}
     <li>{{ team.name }} - {{ ', '.join(team.players) }}</li>
 {% endfor %}
 </ul>
-</body>
-</html>
+{% if data.bracket %}
+<p><a class="btn btn-info" href="/{{ category }}/bracket">Открыть сетку</a></p>
+{% endif %}
+{% endblock %}

@@ -1,15 +1,10 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <title>Управление турниром</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}Категории{% endblock %}
+{% block content %}
 <h1>Категории</h1>
 <ul>
 {% for key, cat in categories.items() %}
     <li><a href="/{{ key }}/teams">{{ cat.label }}</a></li>
 {% endfor %}
 </ul>
-</body>
-</html>
+{% endblock %}

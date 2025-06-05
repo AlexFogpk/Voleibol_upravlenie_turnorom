@@ -1,5 +1,6 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+import json
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 
 app = Flask(__name__)
 
@@ -13,7 +14,28 @@ categories = {
     'group2_mixed': {'label': 'Группа 2 - Микст (3x3)', 'team_size': 3},
 }
 
-tournaments = {key: {'teams': [], 'bracket': []} for key in categories}
+DATA_DIR = 'data'
+os.makedirs(DATA_DIR, exist_ok=True)
+
+tournaments = {}
+
+def load_tournament(category):
+    """Load tournament data from file if available."""
+    path = os.path.join(DATA_DIR, f'{category}.json')
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            tournaments[category] = json.load(f)
+    else:
+        tournaments[category] = {'teams': [], 'bracket': []}
+
+def save_tournament(category):
+    """Persist tournament data to file."""
+    path = os.path.join(DATA_DIR, f'{category}.json')
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(tournaments[category], f, ensure_ascii=False, indent=2)
+
+for key in categories:
+    load_tournament(key)
 
 def generate_bracket(teams):
     """Generate knockout bracket for given teams using byes."""
@@ -97,6 +119,7 @@ def add_team(category):
         if len(players) != cat['team_size']:
             return render_template('add_team.html', category=category, cat=cat, error='Укажите всех игроков')
         tournaments[category]['teams'].append({'name': team_name, 'players': players})
+        save_tournament(category)
         return redirect(url_for('show_teams', category=category))
     return render_template('add_team.html', category=category, cat=cat)
 
@@ -104,6 +127,7 @@ def add_team(category):
 def start_tournament(category):
     data = tournaments[category]
     data['bracket'] = generate_bracket(data['teams'])
+    save_tournament(category)
     return redirect(url_for('view_bracket', category=category))
 
 @app.route('/<category>/bracket', methods=['GET', 'POST'])
@@ -126,7 +150,15 @@ def view_bracket(category):
             next_match_idx = match_idx // 2
             pos = 0 if match_idx % 2 == 0 else 1
             data['bracket'][next_round_idx][next_match_idx][f'team{pos+1}'] = winner
+        save_tournament(category)
     return render_template('bracket.html', category=category, cat=categories[category], data=data)
+
+@app.route('/<category>/export')
+def export_category(category):
+    """Download tournament data as JSON file."""
+    save_tournament(category)
+    filename = f'{category}.json'
+    return send_from_directory(DATA_DIR, filename, as_attachment=True)
 
 if __name__ == '__main__':
     # Railway typically provides the PORT environment variable. Default to 8080

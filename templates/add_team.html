@@ -1,19 +1,18 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <title>Добавить команду - {{ cat.label }}</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}Добавить команду{% endblock %}
+{% block content %}
 <h1>Добавить команду - {{ cat.label }}</h1>
-{% if error %}<p style="color:red">{{ error }}</p>{% endif %}
-<form method="post">
-    <p>Название команды: <input type="text" name="team_name" required></p>
+{% if error %}<p class="text-danger">{{ error }}</p>{% endif %}
+<form method="post" class="mb-3">
+    <div class="mb-2">
+        <label>Название команды: <input class="form-control" type="text" name="team_name" required></label>
+    </div>
     {% for i in range(cat.team_size) %}
-        <p>Игрок {{ i+1 }}: <input type="text" name="player" required></p>
+    <div class="mb-2">
+        <label>Игрок {{ i+1 }}: <input class="form-control" type="text" name="player" required></label>
+    </div>
     {% endfor %}
-    <button type="submit">Сохранить</button>
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    <a class="btn btn-secondary" href="/{{ category }}/teams">Назад</a>
 </form>
-<a href="/{{ category }}/teams">Назад</a>
-</body>
-</html>
+{% endblock %}

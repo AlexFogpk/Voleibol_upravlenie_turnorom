@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Добавить команду - {{ cat.label }}</title>
+</head>
+<body>
+<h1>Добавить команду - {{ cat.label }}</h1>
+{% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+<form method="post">
+    <p>Название команды: <input type="text" name="team_name" required></p>
+    {% for i in range(cat.team_size) %}
+        <p>Игрок {{ i+1 }}: <input type="text" name="player" required></p>
+    {% endfor %}
+    <button type="submit">Сохранить</button>
+</form>
+<a href="/{{ category }}/teams">Назад</a>
+</body>
+</html>
